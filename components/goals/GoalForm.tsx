@@ -20,6 +20,7 @@ export function GoalForm({ defaultType, onClose, onSuccess, goal, isOpen = true 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const isEditing = Boolean(goal);
+  const draftKey = "financeAI_goal_draft";
 
   const [form, setForm] = useState({
     name: goal?.name || "",
@@ -34,6 +35,42 @@ export function GoalForm({ defaultType, onClose, onSuccess, goal, isOpen = true 
     currency: goal?.currency || "ARS",
     product_url: goal?.product_url || "",
   });
+
+  // Restaurar borrador de localStorage solo si estamos creando
+  useEffect(() => {
+    if (!goal) {
+      const draft = localStorage.getItem(draftKey);
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft);
+          setForm((prev) => ({ ...prev, ...parsed }));
+        } catch {
+          // ignore
+        }
+      }
+    } else {
+      setForm({
+        name: goal.name,
+        type: goal.type,
+        description: goal.description || "",
+        target_amount: String(goal.target_amount),
+        current_amount: String(goal.current_amount),
+        target_date: goal.target_date || "",
+        monthly_contribution: String(goal.monthly_contribution),
+        priority: String(goal.priority),
+        color: goal.color,
+        currency: goal.currency,
+        product_url: goal.product_url || "",
+      });
+    }
+  }, [goal]);
+
+  // Guardar en localStorage cada vez que cambia el form
+  useEffect(() => {
+    if (!goal) {
+      localStorage.setItem(draftKey, JSON.stringify(form));
+    }
+  }, [form, goal]);
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -73,6 +110,8 @@ export function GoalForm({ defaultType, onClose, onSuccess, goal, isOpen = true 
       });
 
       if (!res.ok) throw new Error((await res.json()).error || "Error al guardar");
+      
+      if (!isEditing) localStorage.removeItem(draftKey);
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");

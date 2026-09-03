@@ -32,6 +32,7 @@ export function AccountForm({ onClose, onSuccess, account, isOpen = true }: Acco
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const isEditing = Boolean(account);
+  const draftKey = "financeAI_account_draft";
 
   const [form, setForm] = useState({
     name: account?.name || "",
@@ -41,8 +42,19 @@ export function AccountForm({ onClose, onSuccess, account, isOpen = true }: Acco
     color: account?.color || "#3B82F6",
   });
 
+  // Restaurar borrador de localStorage solo si estamos creando
   useEffect(() => {
-    if (account) {
+    if (!account) {
+      const draft = localStorage.getItem(draftKey);
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft);
+          setForm((prev) => ({ ...prev, ...parsed }));
+        } catch {
+          // ignore
+        }
+      }
+    } else {
       setForm({
         name: account.name,
         type: account.type,
@@ -52,6 +64,13 @@ export function AccountForm({ onClose, onSuccess, account, isOpen = true }: Acco
       });
     }
   }, [account]);
+
+  // Guardar en localStorage cada vez que cambia el form
+  useEffect(() => {
+    if (!account) {
+      localStorage.setItem(draftKey, JSON.stringify(form));
+    }
+  }, [form, account]);
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -78,6 +97,8 @@ export function AccountForm({ onClose, onSuccess, account, isOpen = true }: Acco
       });
 
       if (!res.ok) throw new Error((await res.json()).error || "Error al guardar");
+      
+      if (!isEditing) localStorage.removeItem(draftKey);
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");

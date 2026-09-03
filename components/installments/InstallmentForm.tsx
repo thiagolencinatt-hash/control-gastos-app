@@ -16,6 +16,7 @@ export function InstallmentForm({ onClose, onSuccess, isOpen = true }: Installme
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const draftKey = "financeAI_installment_draft";
   const [form, setForm] = useState({
     description: "",
     total_amount: "",
@@ -27,15 +28,39 @@ export function InstallmentForm({ onClose, onSuccess, isOpen = true }: Installme
     due_day: "10",
     start_date: new Date().toISOString().split("T")[0],
     currency: "ARS",
+    currency: "ARS",
     notes: "",
   });
+
+  // Restaurar borrador
+  useEffect(() => {
+    const draft = localStorage.getItem(draftKey);
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        setForm((prev) => ({ ...prev, ...parsed }));
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
+  // Guardar borrador
+  useEffect(() => {
+    localStorage.setItem(draftKey, JSON.stringify(form));
+  }, [form]);
 
   useEffect(() => {
     fetch("/api/accounts")
       .then((r) => r.json())
       .then((data) => {
         setAccounts(data || []);
-        if (data?.[0]) setForm((f) => ({ ...f, account_id: data[0].id }));
+        if (data?.[0]) {
+          setForm((f) => {
+            if (!f.account_id) return { ...f, account_id: data[0].id };
+            return f;
+          });
+        }
       });
   }, []);
 
@@ -83,6 +108,8 @@ export function InstallmentForm({ onClose, onSuccess, isOpen = true }: Installme
       });
 
       if (!res.ok) throw new Error((await res.json()).error);
+      
+      localStorage.removeItem(draftKey);
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");
