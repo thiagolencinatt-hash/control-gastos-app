@@ -1,0 +1,733 @@
+import type { Account, Category, FinancialSummary, Installment, SavingsGoal, Transaction } from "./types";
+
+const nowIso = new Date().toISOString();
+
+export let configuredSalary: number = 980000;
+export let salaryPayDay: number = 5;
+
+export let demoAccounts: Account[] = [
+  {
+    id: "acc-1",
+    user_id: "demo-user",
+    name: "Santander Río",
+    type: "bank",
+    balance: 685400,
+    currency: "ARS",
+    color: "#EF4444",
+    icon: "Building2",
+    is_active: true,
+    created_at: nowIso,
+    updated_at: nowIso,
+  },
+  {
+    id: "acc-2",
+    user_id: "demo-user",
+    name: "Mercado Pago",
+    type: "digital_wallet",
+    balance: 142800,
+    currency: "ARS",
+    color: "#3B82F6",
+    icon: "Smartphone",
+    is_active: true,
+    created_at: nowIso,
+    updated_at: nowIso,
+  },
+  {
+    id: "acc-3",
+    user_id: "demo-user",
+    name: "Ahorros Dólares",
+    type: "cash",
+    balance: 1450,
+    currency: "USD",
+    color: "#10B981",
+    icon: "Wallet",
+    is_active: true,
+    created_at: nowIso,
+    updated_at: nowIso,
+  },
+  {
+    id: "acc-4",
+    user_id: "demo-user",
+    name: "Binance (Crypto)",
+    type: "crypto",
+    balance: 0.024,
+    currency: "BTC",
+    color: "#F59E0B",
+    icon: "Bitcoin",
+    is_active: true,
+    created_at: nowIso,
+    updated_at: nowIso,
+  },
+];
+
+export let demoCategories: Category[] = [
+  { id: "cat-1", user_id: "demo-user", name: "Sueldo Principal", type: "income", icon: "Briefcase", color: "#10B981", is_default: true, created_at: nowIso },
+  { id: "cat-1b", user_id: "demo-user", name: "Trabajos Freelance / Extra", type: "income", icon: "Laptop", color: "#3B82F6", is_default: true, created_at: nowIso },
+  { id: "cat-1c", user_id: "demo-user", name: "Rendimientos e Inversiones", type: "income", icon: "TrendingUp", color: "#F59E0B", is_default: true, created_at: nowIso },
+  { id: "cat-2", user_id: "demo-user", name: "Supermercado y Alimentos", type: "expense", icon: "ShoppingCart", color: "#6366F1", is_default: true, created_at: nowIso },
+  { id: "cat-3", user_id: "demo-user", name: "Servicios e Impuestos", type: "expense", icon: "Home", color: "#F97316", is_default: true, created_at: nowIso },
+  { id: "cat-4", user_id: "demo-user", name: "Salidas y Restaurantes", type: "expense", icon: "Coffee", color: "#EC4899", is_default: true, created_at: nowIso },
+  { id: "cat-5", user_id: "demo-user", name: "Transporte y Nafta", type: "expense", icon: "Car", color: "#3B82F6", is_default: true, created_at: nowIso },
+  { id: "cat-6", user_id: "demo-user", name: "Salud y Gimnasio", type: "expense", icon: "Activity", color: "#14B8A6", is_default: true, created_at: nowIso },
+  { id: "cat-7", user_id: "demo-user", name: "Entretenimiento y Suscripciones", type: "expense", icon: "Tv", color: "#8B5CF6", is_default: true, created_at: nowIso },
+];
+
+export let demoTransactions: Transaction[] = [
+  {
+    id: "tx-1",
+    user_id: "demo-user",
+    account_id: "acc-1",
+    category_id: "cat-1",
+    amount: 980000,
+    type: "income",
+    currency: "ARS",
+    date: new Date(Date.now() - 2 * 86400000).toISOString().split("T")[0],
+    description: "Cobro de Sueldo Mensual",
+    installment_id: null,
+    transfer_to_account_id: null,
+    exchange_rate: null,
+    created_at: nowIso,
+    updated_at: nowIso,
+    account: demoAccounts[0],
+    category: demoCategories[0],
+  },
+  {
+    id: "tx-2",
+    user_id: "demo-user",
+    account_id: "acc-2",
+    category_id: "cat-2",
+    amount: 48500,
+    type: "expense",
+    currency: "ARS",
+    date: new Date(Date.now() - 1 * 86400000).toISOString().split("T")[0],
+    description: "Supermercado Coto",
+    installment_id: null,
+    transfer_to_account_id: null,
+    exchange_rate: null,
+    created_at: nowIso,
+    updated_at: nowIso,
+    account: demoAccounts[1],
+    category: demoCategories[3],
+  },
+  {
+    id: "tx-3",
+    user_id: "demo-user",
+    account_id: "acc-1",
+    category_id: "cat-3",
+    amount: 82000,
+    type: "expense",
+    currency: "ARS",
+    date: new Date(Date.now() - 3 * 86400000).toISOString().split("T")[0],
+    description: "Expensas & Luz Edenor",
+    installment_id: null,
+    transfer_to_account_id: null,
+    exchange_rate: null,
+    created_at: nowIso,
+    updated_at: nowIso,
+    account: demoAccounts[0],
+    category: demoCategories[4],
+  },
+];
+
+export const DEMO_ACCOUNTS = demoAccounts;
+export const DEMO_CATEGORIES = demoCategories;
+export const DEMO_TRANSACTIONS = demoTransactions;
+
+export let demoInstallments: Installment[] = [
+  {
+    id: "inst-1",
+    user_id: "demo-user",
+    account_id: "acc-1",
+    category_id: "cat-7",
+    description: "Smart TV 55'' Samsung 4K",
+    total_amount: 540000,
+    currency: "ARS",
+    total_installments: 6,
+    paid_installments: 2,
+    installment_amount: 90000,
+    has_interest: false,
+    interest_rate: 0,
+    cft_total: 0,
+    net_amount: 540000,
+    due_day: 10,
+    start_date: new Date(Date.now() - 60 * 86400000).toISOString().split("T")[0],
+    notes: null,
+    is_active: true,
+    created_at: nowIso,
+    updated_at: nowIso,
+    account: demoAccounts[0],
+    category: demoCategories[8],
+  },
+  {
+    id: "inst-2",
+    user_id: "demo-user",
+    account_id: "acc-1",
+    category_id: "cat-6",
+    description: "Zapatillas Running Nike Zoom",
+    total_amount: 165000,
+    currency: "ARS",
+    total_installments: 3,
+    paid_installments: 1,
+    installment_amount: 55000,
+    has_interest: false,
+    interest_rate: 0,
+    cft_total: 0,
+    net_amount: 165000,
+    due_day: 15,
+    start_date: new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0],
+    notes: null,
+    is_active: true,
+    created_at: nowIso,
+    updated_at: nowIso,
+    account: demoAccounts[0],
+    category: demoCategories[7],
+  },
+];
+
+export const DEMO_INSTALLMENTS = demoInstallments;
+
+export let demoGoals: SavingsGoal[] = [
+  {
+    id: "goal-1",
+    user_id: "demo-user",
+    name: "Fondo de Emergencia (6 meses)",
+    type: "goal",
+    description: "Respaldo financiero para imprevistos",
+    target_amount: 2500000,
+    current_amount: 1450000,
+    currency: "ARS",
+    monthly_contribution: 150000,
+    target_date: new Date(Date.now() + 180 * 86400000).toISOString().split("T")[0],
+    priority: 1,
+    color: "#10B981",
+    icon: "Shield",
+    image_url: null,
+    product_url: null,
+    is_completed: false,
+    completed_at: null,
+    created_at: nowIso,
+    updated_at: nowIso,
+  },
+  {
+    id: "goal-2",
+    user_id: "demo-user",
+    name: "Vacaciones Brasil 2027",
+    type: "goal",
+    description: "Vuelos y estadía en Florianópolis",
+    target_amount: 2000000,
+    current_amount: 600000,
+    currency: "ARS",
+    monthly_contribution: 100000,
+    target_date: new Date(Date.now() + 240 * 86400000).toISOString().split("T")[0],
+    priority: 2,
+    color: "#3B82F6",
+    icon: "Plane",
+    image_url: null,
+    product_url: null,
+    is_completed: false,
+    completed_at: null,
+    created_at: nowIso,
+    updated_at: nowIso,
+  },
+  {
+    id: "wish-1",
+    user_id: "demo-user",
+    name: "Monitor Gamer 27'' QHD",
+    type: "wishlist",
+    description: "Para trabajo y setup",
+    target_amount: 380000,
+    current_amount: 120000,
+    currency: "ARS",
+    monthly_contribution: 50000,
+    target_date: null,
+    priority: 3,
+    color: "#8B5CF6",
+    icon: "Monitor",
+    image_url: null,
+    product_url: null,
+    is_completed: false,
+    completed_at: null,
+    created_at: nowIso,
+    updated_at: nowIso,
+  },
+];
+
+export const DEMO_GOALS = demoGoals;
+
+// Mutaciones en memoria para Cuentas
+export function getDemoAccounts() {
+  return demoAccounts.filter((a) => a.is_active);
+}
+
+export function addDemoAccount(accountData: Partial<Account>): Account {
+  const newAcc: Account = {
+    id: "acc-" + Date.now(),
+    user_id: "demo-user",
+    name: accountData.name || "Nueva Cuenta",
+    type: accountData.type || "bank",
+    balance: Number(accountData.balance) || 0,
+    currency: accountData.currency || "ARS",
+    color: accountData.color || "#6366F1",
+    icon: accountData.icon || "Wallet",
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  demoAccounts = [newAcc, ...demoAccounts];
+  return newAcc;
+}
+
+export function updateDemoAccount(id: string, updates: Partial<Account>): Account | null {
+  const index = demoAccounts.findIndex((a) => a.id === id);
+  if (index === -1) return null;
+  demoAccounts[index] = {
+    ...demoAccounts[index],
+    ...updates,
+    updated_at: new Date().toISOString(),
+  };
+  return demoAccounts[index];
+}
+
+export function deleteDemoAccount(id: string) {
+  demoAccounts = demoAccounts.filter((a) => a.id !== id);
+}
+
+// Mutaciones en memoria para Transacciones
+export function getDemoTransactions() {
+  return demoTransactions;
+}
+
+export function addDemoTransaction(txData: Partial<Transaction>): Transaction {
+  const account = demoAccounts.find((a) => a.id === txData.account_id) || demoAccounts[0];
+  const category = demoCategories.find((c) => c.id === txData.category_id) || demoCategories[0];
+  const amount = Number(txData.amount) || 0;
+
+  const newTx: Transaction = {
+    id: "tx-" + Date.now(),
+    user_id: "demo-user",
+    account_id: account?.id || "acc-1",
+    category_id: category?.id || null,
+    amount,
+    type: txData.type || "expense",
+    currency: txData.currency || account?.currency || "ARS",
+    date: txData.date || new Date().toISOString().split("T")[0],
+    description: txData.description || null,
+    installment_id: null,
+    transfer_to_account_id: txData.transfer_to_account_id || null,
+    exchange_rate: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    account,
+    category,
+  };
+
+  if (account) {
+    if (newTx.type === "income") {
+      account.balance += amount;
+    } else if (newTx.type === "expense") {
+      account.balance -= amount;
+    } else if (newTx.type === "transfer" && newTx.transfer_to_account_id) {
+      account.balance -= amount;
+      const targetAcc = demoAccounts.find((a) => a.id === newTx.transfer_to_account_id);
+      if (targetAcc) targetAcc.balance += amount;
+    }
+  }
+
+  demoTransactions = [newTx, ...demoTransactions];
+  return newTx;
+}
+
+export function updateDemoTransaction(id: string, updates: Partial<Transaction>): Transaction | null {
+  const index = demoTransactions.findIndex((t) => t.id === id);
+  if (index === -1) return null;
+
+  const prev = demoTransactions[index];
+  const account = demoAccounts.find((a) => a.id === (updates.account_id || prev.account_id)) || prev.account;
+  const category = demoCategories.find((c) => c.id === (updates.category_id !== undefined ? updates.category_id : prev.category_id)) || prev.category;
+
+  demoTransactions[index] = {
+    ...prev,
+    ...updates,
+    amount: updates.amount !== undefined ? Number(updates.amount) : prev.amount,
+    account,
+    category,
+    updated_at: new Date().toISOString(),
+  };
+
+  return demoTransactions[index];
+}
+
+export function deleteDemoTransaction(id: string) {
+  const tx = demoTransactions.find((t) => t.id === id);
+  if (tx && tx.account_id) {
+    const acc = demoAccounts.find((a) => a.id === tx.account_id);
+    if (acc) {
+      if (tx.type === "income") acc.balance -= tx.amount;
+      if (tx.type === "expense") acc.balance += tx.amount;
+    }
+  }
+  demoTransactions = demoTransactions.filter((t) => t.id !== id);
+}
+
+// Vaciar solo los gastos
+export function clearAllExpenses() {
+  demoTransactions = demoTransactions.filter((t) => t.type !== "expense");
+  demoInstallments = [];
+}
+
+// Mutaciones para Metas de Ahorro
+export function getDemoGoals() {
+  return demoGoals;
+}
+
+export function addDemoGoal(goalData: Partial<SavingsGoal>): SavingsGoal {
+  const newGoal: SavingsGoal = {
+    id: "goal-" + Date.now(),
+    user_id: "demo-user",
+    name: goalData.name || "Nueva Meta",
+    type: goalData.type || "goal",
+    description: goalData.description || null,
+    target_amount: Number(goalData.target_amount) || 0,
+    current_amount: Number(goalData.current_amount) || 0,
+    currency: goalData.currency || "ARS",
+    monthly_contribution: Number(goalData.monthly_contribution) || 0,
+    target_date: goalData.target_date || null,
+    priority: Number(goalData.priority) || 2,
+    color: goalData.color || "#10B981",
+    icon: goalData.icon || "Target",
+    image_url: goalData.image_url || null,
+    product_url: goalData.product_url || null,
+    is_completed: false,
+    completed_at: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  demoGoals = [newGoal, ...demoGoals];
+  return newGoal;
+}
+
+export function updateDemoGoal(id: string, updates: Partial<SavingsGoal>): SavingsGoal | null {
+  const index = demoGoals.findIndex((g) => g.id === id);
+  if (index === -1) return null;
+  demoGoals[index] = {
+    ...demoGoals[index],
+    ...updates,
+    target_amount: updates.target_amount !== undefined ? Number(updates.target_amount) : demoGoals[index].target_amount,
+    current_amount: updates.current_amount !== undefined ? Number(updates.current_amount) : demoGoals[index].current_amount,
+    monthly_contribution: updates.monthly_contribution !== undefined ? Number(updates.monthly_contribution) : demoGoals[index].monthly_contribution,
+    updated_at: new Date().toISOString(),
+  };
+  return demoGoals[index];
+}
+
+export function deleteDemoGoal(id: string) {
+  demoGoals = demoGoals.filter((g) => g.id !== id);
+}
+
+export function clearAllGoals() {
+  demoGoals = [];
+}
+
+// Distribuir sueldo / ingresos en metas
+export function distributeSalaryToGoals(allocations: Array<{ id: string; monthly_contribution: number; priority?: number }>) {
+  allocations.forEach((item) => {
+    const goal = demoGoals.find((g) => g.id === item.id);
+    if (goal) {
+      goal.monthly_contribution = Number(item.monthly_contribution) || 0;
+      if (item.priority !== undefined) goal.priority = item.priority;
+    }
+  });
+  return demoGoals;
+}
+
+// Mutaciones para Cuotas
+export function getDemoInstallments() {
+  return demoInstallments;
+}
+
+export function addDemoInstallment(instData: Partial<Installment>): Installment {
+  const account = demoAccounts.find((a) => a.id === instData.account_id) || demoAccounts[0];
+  const category = demoCategories.find((c) => c.id === instData.category_id) || demoCategories[0];
+  const totalInstallments = Number(instData.total_installments) || 1;
+  const totalAmount = Number(instData.total_amount) || 0;
+  const installmentAmount = Number(instData.installment_amount) || (totalAmount / totalInstallments);
+
+  const newInst: Installment = {
+    id: "inst-" + Date.now(),
+    user_id: "demo-user",
+    account_id: account?.id || "acc-1",
+    category_id: category?.id || null,
+    description: instData.description || "Nueva Cuota",
+    total_amount: totalAmount,
+    currency: instData.currency || "ARS",
+    total_installments: totalInstallments,
+    paid_installments: Number(instData.paid_installments) || 0,
+    installment_amount: installmentAmount,
+    has_interest: Boolean(instData.has_interest),
+    interest_rate: Number(instData.interest_rate) || 0,
+    cft_total: Number(instData.cft_total) || 0,
+    net_amount: instData.net_amount !== undefined ? Number(instData.net_amount) : totalAmount,
+    due_day: Number(instData.due_day) || 10,
+    start_date: instData.start_date || new Date().toISOString().split("T")[0],
+    notes: instData.notes || null,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    account,
+    category,
+  };
+  demoInstallments = [newInst, ...demoInstallments];
+  return newInst;
+}
+
+export function updateDemoInstallment(id: string, updates: Partial<Installment>): Installment | null {
+  const index = demoInstallments.findIndex((i) => i.id === id);
+  if (index === -1) return null;
+  demoInstallments[index] = {
+    ...demoInstallments[index],
+    ...updates,
+    updated_at: new Date().toISOString(),
+  };
+  return demoInstallments[index];
+}
+
+export function deleteDemoInstallment(id: string) {
+  demoInstallments = demoInstallments.filter((i) => i.id !== id);
+}
+
+export function clearAllInstallments() {
+  demoInstallments = [];
+}
+
+// Configurar sueldo mensual directo
+export function setSalaryConfig({
+  amount,
+  payDay = 5,
+  alsoUpdateCurrentBalance = false,
+  accountId,
+}: {
+  amount: number;
+  payDay?: number;
+  alsoUpdateCurrentBalance?: boolean;
+  accountId?: string;
+}) {
+  configuredSalary = Number(amount) || 0;
+  salaryPayDay = Number(payDay) || 5;
+
+  const targetAcc = demoAccounts.find((a) => a.id === accountId) || demoAccounts[0];
+
+  if (targetAcc && alsoUpdateCurrentBalance) {
+    targetAcc.balance = configuredSalary;
+  }
+
+  const existingIndex = demoTransactions.findIndex(
+    (t) => t.type === "income" && (t.description?.includes("Sueldo") || t.category_id === "cat-1")
+  );
+
+  const salaryTx: Transaction = {
+    id: "tx-salary-" + Date.now(),
+    user_id: "demo-user",
+    account_id: targetAcc?.id || "acc-1",
+    category_id: "cat-1",
+    amount: configuredSalary,
+    type: "income",
+    currency: targetAcc?.currency || "ARS",
+    date: new Date().toISOString().split("T")[0],
+    description: "Cobro de Sueldo Mensual",
+    installment_id: null,
+    transfer_to_account_id: null,
+    exchange_rate: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    account: targetAcc,
+    category: demoCategories[0],
+  };
+
+  if (existingIndex >= 0) {
+    demoTransactions[existingIndex] = salaryTx;
+  } else {
+    demoTransactions = [salaryTx, ...demoTransactions];
+  }
+
+  return getDemoSummary();
+}
+
+// Establecer exactamente la plata actual que tenés (Saldo total) y limpiar gastos ficticios si se desea
+export function setExactCashInHand({
+  totalAmount,
+  accountName = "Mi Billetera Principal",
+  clearExpenses = false,
+  setSalaryAmount,
+}: {
+  totalAmount: number;
+  accountName?: string;
+  clearExpenses?: boolean;
+  setSalaryAmount?: number;
+}) {
+  if (clearExpenses) {
+    clearAllExpenses();
+  }
+
+  if (demoAccounts.length <= 1) {
+    demoAccounts = [
+      {
+        id: "acc-user-1",
+        user_id: "demo-user",
+        name: accountName || "Billetera Principal",
+        type: "bank",
+        balance: Number(totalAmount) || 0,
+        currency: "ARS",
+        color: "#3B82F6",
+        icon: "Wallet",
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ];
+  } else {
+    demoAccounts[0].balance = Number(totalAmount) || 0;
+    demoAccounts[0].name = accountName || demoAccounts[0].name;
+    for (let i = 1; i < demoAccounts.length; i++) {
+      demoAccounts[i].balance = 0;
+    }
+  }
+
+  if (setSalaryAmount !== undefined && setSalaryAmount > 0) {
+    setSalaryConfig({
+      amount: setSalaryAmount,
+      alsoUpdateCurrentBalance: false,
+    });
+  }
+
+  return getDemoSummary();
+}
+
+// Limpiar todas las transacciones de prueba para empezar de cero ("Cuenta Real Limpia")
+export function resetToCleanAccount(initialBalance: number = 0, accountName: string = "Mi Billetera Principal"): Account {
+  const newAcc: Account = {
+    id: "acc-user-1",
+    user_id: "demo-user",
+    name: accountName || "Mi Billetera Principal",
+    type: "bank",
+    balance: Number(initialBalance) || 0,
+    currency: "ARS",
+    color: "#3B82F6",
+    icon: "Wallet",
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  demoAccounts = [newAcc];
+  demoTransactions = [];
+  demoInstallments = [];
+  demoGoals = [];
+
+  return newAcc;
+}
+
+// Establecer directamente los totales mensuales y saldos
+export function setDirectFinances({
+  totalBalance,
+  monthlyIncome,
+  monthlyExpense,
+  accountName = "Mi Billetera Principal",
+  clearExpenses = false,
+}: {
+  totalBalance?: number;
+  monthlyIncome?: number;
+  monthlyExpense?: number;
+  accountName?: string;
+  clearExpenses?: boolean;
+}) {
+  if (clearExpenses) {
+    clearAllExpenses();
+  }
+
+  if (totalBalance !== undefined) {
+    setExactCashInHand({
+      totalAmount: Number(totalBalance),
+      accountName,
+      clearExpenses,
+    });
+  }
+
+  if (monthlyIncome !== undefined && monthlyIncome > 0) {
+    setSalaryConfig({
+      amount: Number(monthlyIncome),
+      alsoUpdateCurrentBalance: false,
+    });
+  }
+
+  if (monthlyExpense !== undefined && monthlyExpense > 0) {
+    const existingExpenseIndex = demoTransactions.findIndex((t) => t.type === "expense");
+    const expenseTx: Transaction = {
+      id: "tx-direct-expense-" + Date.now(),
+      user_id: "demo-user",
+      account_id: demoAccounts[0]?.id || "acc-1",
+      category_id: "cat-3",
+      amount: Number(monthlyExpense),
+      type: "expense",
+      currency: "ARS",
+      date: new Date().toISOString().split("T")[0],
+      description: "Gastos Mensuales",
+      installment_id: null,
+      transfer_to_account_id: null,
+      exchange_rate: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      account: demoAccounts[0],
+      category: demoCategories[4],
+    };
+
+    if (existingExpenseIndex >= 0) {
+      demoTransactions[existingExpenseIndex] = expenseTx;
+    } else {
+      demoTransactions = [expenseTx, ...demoTransactions.filter((t) => t.type !== "expense")];
+    }
+  }
+
+  return getDemoSummary();
+}
+
+// Resumen financiero dinámico
+export function getDemoSummary(): FinancialSummary {
+  const activeAccounts = getDemoAccounts();
+  const totalBalance = activeAccounts.reduce((sum, a) => sum + (a.currency === "ARS" ? a.balance : 0), 0);
+  
+  const income30d = demoTransactions.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const expense30d = demoTransactions.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const monthlyInstallments = demoInstallments.reduce((s, i) => s + i.installment_amount, 0);
+
+  const catMap: Record<string, { category_name: string; total: number; count: number }> = {};
+  demoTransactions.filter((t) => t.type === "expense").forEach((t) => {
+    const name = t.category?.name || "Sin categoría";
+    if (!catMap[name]) catMap[name] = { category_name: name, total: 0, count: 0 };
+    catMap[name].total += t.amount;
+    catMap[name].count += 1;
+  });
+
+  const topCategories = Object.values(catMap).sort((a, b) => b.total - a.total);
+
+  return {
+    accounts: activeAccounts,
+    total_balance: totalBalance,
+    total_balance_ars: totalBalance,
+    income_30d: income30d,
+    expense_30d: expense30d,
+    configured_salary: configuredSalary,
+    salary_pay_day: salaryPayDay,
+    active_installments: demoInstallments,
+    total_installments_monthly: monthlyInstallments,
+    upcoming_installments: demoInstallments.length > 0 ? [
+      {
+        description: "Smart TV 55'' (Cuota 3/6)",
+        amount: 90000,
+        due_date: new Date(Date.now() + 5 * 86400000).toISOString().split("T")[0],
+        account_name: "Santander Río",
+      },
+    ] : [],
+    top_categories: topCategories,
+    savings_goals: demoGoals,
+  };
+}
