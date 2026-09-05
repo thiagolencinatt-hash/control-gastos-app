@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import type { GoalType, SavingsGoal } from "@/lib/types";
 import { DraggableWindow } from "../ui/DraggableWindow";

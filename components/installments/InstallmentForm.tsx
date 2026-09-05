@@ -28,7 +28,6 @@ export function InstallmentForm({ onClose, onSuccess, isOpen = true }: Installme
     due_day: "10",
     start_date: new Date().toISOString().split("T")[0],
     currency: "ARS",
-    currency: "ARS",
     notes: "",
   });
 
